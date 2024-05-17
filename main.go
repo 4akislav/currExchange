@@ -1,8 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"io"
+	"genesis/internal"
 	"net/http"
 )
 
@@ -18,13 +19,22 @@ func main() {
 		}
 		defer resp.Body.Close()
 
-		body, err := io.ReadAll(resp.Body)
+		var data []internal.Currency
+
+		err = json.NewDecoder(resp.Body).Decode(&data)
 		if err != nil {
-			http.Error(w, "Failed to read API response body", http.StatusInternalServerError)
+			http.Error(w, "Failed to decode API response", http.StatusInternalServerError)
 			return
 		}
 
-		fmt.Fprintf(w, "Response body: %s\n", body)
+		if len(data) == 0 {
+			http.Error(w, "No currency data found", http.StatusInternalServerError)
+			return
+		}
+
+		usdExchange := data[0]
+
+		fmt.Fprintf(w, "Вартість доллара в закупівлю: %.2f.\nВартість доллара на продаж: %.2f.", usdExchange.Buy, usdExchange.Sale)
 
 	})
 
