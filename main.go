@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"genesis/internal"
+	"genesis/internal/models"
 	"io"
 	"net/http"
 )
@@ -26,7 +27,7 @@ func main() {
 			return
 		}
 
-		var data []internal.Currency
+		var data []models.Currency
 
 		if err := json.Unmarshal(body, &data); err != nil {
 			fmt.Println("Can not unmarshal JSON", err)
